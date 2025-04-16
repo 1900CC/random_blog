@@ -26,7 +26,9 @@
         </el-select>
       </div>
       
-      <el-button type="primary" @click="goToRandomBlog">随机访问博客</el-button>
+      <router-link to="/random">
+        <el-button type="primary" icon="el-icon-magic-stick">随机博客体验</el-button>
+      </router-link>
     </div>
     
     <el-row :gutter="20" class="blog-list">
@@ -127,17 +129,6 @@ export default {
     },
     openBlog(url) {
       window.open(url, '_blank')
-    },
-    async goToRandomBlog() {
-      try {
-        const response = await this.$http.get('/api/random')
-        if (response.data && response.data.url) {
-          window.open(response.data.url, '_blank')
-        }
-      } catch (error) {
-        console.error('Error getting random blog:', error)
-        this.$message.error('获取随机博客失败')
-      }
     }
   }
 }

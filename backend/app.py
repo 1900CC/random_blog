@@ -100,14 +100,32 @@ def get_tags():
     tags = get_all_tags(blogs)
     return jsonify(tags)
 
-# 路由 - 获取随机博客
+# 路由 - 获取随机博客（支持多标签筛选）
 @app.route('/api/random', methods=['GET'])
 def get_random_blog():
     blogs = load_blogs()
     if not blogs:
         return jsonify({'error': 'No blogs available'}), 404
     
-    random_blog = random.choice(blogs)
+    # 获取所有tag参数（可以有多个）
+    tags = request.args.getlist('tag')
+    
+    # 如果指定了标签，只在符合标签的博客中随机选择
+    if tags:
+        filtered_blogs = []
+        for blog in blogs:
+            # 检查博客是否包含所有指定的标签
+            if all(tag in blog['tags'] for tag in tags):
+                filtered_blogs.append(blog)
+        
+        # 如果没有符合所有标签的博客，返回错误
+        if not filtered_blogs:
+            return jsonify({'error': 'No blogs with the specified tags'}), 404
+        
+        random_blog = random.choice(filtered_blogs)
+    else:
+        random_blog = random.choice(blogs)
+    
     return jsonify(random_blog)
 
 # 服务前端静态文件
